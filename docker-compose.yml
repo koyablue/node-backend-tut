@@ -5,23 +5,37 @@ services:
     restart: always
     build: .
     ports:
-      - ${PORT}:${PORT}
+      # - ${PORT}:${PORT}
+      - '5001:5001'
+    environment:
+      PGHOST: postgres
     depends_on:
-      - db
+      - postgres
     volumes:
       - .:/usr/src/app
-  db:
-    container_name: postgres
-    # for M1 mac
-    # for intel mac -> postgres
-    image: postgres:14.3-alpine
-    ports:
-      - 5433:${DB_PORT}
-    volumes:
-      - data:/data/db
+  # db:
+  #   container_name: postgres
+  #   # for M1 mac
+  #   # for intel mac -> postgres
+  #   image: arm64v8/postgres
+  #   user: ${DB_USER}
+  #   ports:
+  #     - 5432:5432
+  #   volumes:
+  #     - data:/data/db
+  #   environment:
+  #     - POSTGRES_PASSWORD=${DB_PASSWORD}
+  #     - POSTGRES_DB=${DB_NAME}
+  postgres:
+    image: arm64v8/postgres:latest
+    # specify the platform to avoid this error:
+    # postgres The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+    # platform: linux/arm64/v8
     environment:
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
-      - POSTGRES_HOST_AUTH_METHOD=trust
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    # map local 5432 port to 5432 port in the container
+    ports:
+      - '5432:5432'
 volumes:
   data: {}
