@@ -1,14 +1,15 @@
 version: '3.8'
 services:
   api:
+    env_file: ./.env
     container_name: api
     restart: always
     build: .
     ports:
-      # - ${PORT}:${PORT}
-      - '5001:5001'
-    environment:
-      PGHOST: postgres
+      - ${PORT}:${PORT}
+      # - '5001:5001'
+    # environment:
+    #   PGHOST: postgres
     depends_on:
       - postgres
     volumes:
@@ -27,15 +28,17 @@ services:
   #     - POSTGRES_PASSWORD=${DB_PASSWORD}
   #     - POSTGRES_DB=${DB_NAME}
   postgres:
+    env_file: ./.env
     image: arm64v8/postgres:latest
     # specify the platform to avoid this error:
     # postgres The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
     # platform: linux/arm64/v8
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     # map local 5432 port to 5432 port in the container
     ports:
-      - '5432:5432'
+      # - '5432:5432'
+      - ${DB_PORT}:${DB_PORT}
 volumes:
   data: {}
